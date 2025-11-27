@@ -1,0 +1,31 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: transparent;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+#chat-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 400px;
+}
+
+.chat-message {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

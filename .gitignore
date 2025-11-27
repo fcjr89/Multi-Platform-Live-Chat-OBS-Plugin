@@ -1,0 +1,15 @@
+﻿build/
+cmake-build-*/
+.vscode/
+.vs/
+*.suo
+*.user
+.idea/
+*.o
+*.so
+*.dylib
+*.dll
+CMakeCache.txt
+CMakeFiles/
+.DS_Store
+Thumbs.db
