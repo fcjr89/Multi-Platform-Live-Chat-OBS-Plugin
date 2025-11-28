@@ -5,7 +5,7 @@ KickHandler::KickHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &KickHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &KickHandler::onPollTimer);
 }
 
 KickHandler::~KickHandler()

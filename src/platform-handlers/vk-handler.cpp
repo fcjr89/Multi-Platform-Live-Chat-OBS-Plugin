@@ -5,7 +5,7 @@ VkHandler::VkHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &VkHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &VkHandler::onPollTimer);
 }
 
 VkHandler::~VkHandler()

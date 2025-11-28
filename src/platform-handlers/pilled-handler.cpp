@@ -5,7 +5,7 @@ PilledHandler::PilledHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &PilledHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &PilledHandler::onPollTimer);
 }
 
 PilledHandler::~PilledHandler()

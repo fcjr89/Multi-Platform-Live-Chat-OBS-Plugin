@@ -9,7 +9,7 @@ YouTubeHandler::YouTubeHandler(QObject *parent)
     , m_pollTimer(new QTimer(this))
     , m_pollInterval(5000)
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &YouTubeHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &YouTubeHandler::onPollTimer);
 }
 
 YouTubeHandler::~YouTubeHandler()

@@ -5,7 +5,7 @@ RumbleHandler::RumbleHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &RumbleHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &RumbleHandler::onPollTimer);
 }
 
 RumbleHandler::~RumbleHandler()

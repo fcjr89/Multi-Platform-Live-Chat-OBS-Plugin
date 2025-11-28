@@ -5,7 +5,7 @@ TwitterHandler::TwitterHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &TwitterHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &TwitterHandler::onPollTimer);
 }
 
 TwitterHandler::~TwitterHandler()

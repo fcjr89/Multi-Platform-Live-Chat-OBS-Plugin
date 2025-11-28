@@ -5,7 +5,7 @@ Fc2Handler::Fc2Handler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &Fc2Handler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &Fc2Handler::onPollTimer);
 }
 
 Fc2Handler::~Fc2Handler()

@@ -7,12 +7,12 @@ TwitchHandler::TwitchHandler(QObject *parent)
     , m_webSocket(new QWebSocket("", QWebSocketProtocol::VersionLatest, this))
     , m_pingTimer(new QTimer(this))
 {
-    connect(m_webSocket, &QWebSocket::connected, this, &TwitchHandler::onWebSocketConnected);
-    connect(m_webSocket, &QWebSocket::disconnected, this, &TwitchHandler::onWebSocketDisconnected);
-    connect(m_webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+    QObject::connect(m_webSocket, &QWebSocket::connected, this, &TwitchHandler::onWebSocketConnected);
+    QObject::connect(m_webSocket, &QWebSocket::disconnected, this, &TwitchHandler::onWebSocketDisconnected);
+    QObject::connect(m_webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
             this, &TwitchHandler::onWebSocketError);
-    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &TwitchHandler::onTextMessageReceived);
-    connect(m_pingTimer, &QTimer::timeout, this, &TwitchHandler::onPingTimer);
+    QObject::connect(m_webSocket, &QWebSocket::textMessageReceived, this, &TwitchHandler::onTextMessageReceived);
+    QObject::connect(m_pingTimer, &QTimer::timeout, this, &TwitchHandler::onPingTimer);
 }
 
 TwitchHandler::~TwitchHandler()

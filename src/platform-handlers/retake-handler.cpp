@@ -5,7 +5,7 @@ RetakeHandler::RetakeHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &RetakeHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &RetakeHandler::onPollTimer);
 }
 
 RetakeHandler::~RetakeHandler()

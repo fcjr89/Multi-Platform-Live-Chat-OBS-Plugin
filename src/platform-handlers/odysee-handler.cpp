@@ -5,7 +5,7 @@ OdyseeHandler::OdyseeHandler(QObject *parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &OdyseeHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &OdyseeHandler::onPollTimer);
 }
 
 OdyseeHandler::~OdyseeHandler()
