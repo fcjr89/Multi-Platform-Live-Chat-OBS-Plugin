@@ -2,7 +2,7 @@
 
 project(multi-platform-chat VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 20)  # ← Changed from 17 to 20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -21,7 +21,11 @@ if(WIN32)
         message(FATAL_ERROR "LIBOBS_INCLUDE_DIR not set")
     endif()
     
+    # Set OBS library paths for Windows
+    set(OBS_LIB_DIR "${LIBOBS_INCLUDE_DIR}/../bin/64bit")
+    
     message(STATUS "OBS Include Dir: ${LIBOBS_INCLUDE_DIR}")
+    message(STATUS "OBS Lib Dir: ${OBS_LIB_DIR}")
 else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBOBS REQUIRED libobs)
@@ -66,11 +70,27 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::WebSockets
 )
 
+# Link OBS libraries
+if(WIN32)
+    # Link to OBS DLL via import library (created at runtime)
+    target_link_options(${PROJECT_NAME} PRIVATE 
+        "/DELAYLOAD:obs.dll"
+        "/DELAYLOAD:obs-frontend-api.dll"
+    )
+    target_link_libraries(${PROJECT_NAME}
+        delayimp.lib
+    )
+else()
+    target_link_libraries(${PROJECT_NAME}
+        ${LIBOBS_LIBRARIES}
+    )
+endif()
+
 # Include OBS headers (both libobs and UI)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${LIBOBS_INCLUDE_DIR}
-    ${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api  # ← Added for obs-frontend-api.h
+    ${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api
 )
 
 # Set properties
