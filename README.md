@@ -33,3 +33,14 @@ See [docs/BUILDING.md](docs/BUILDING.md)
 ## 📄 License
 
 MIT License
+
+---
+
+## 🌐 More From Us
+
+This plugin is part of [The Culture War](https://fcjr89.github.io/theculturewar) project.
+
+Visit our website for more tools and resources!
+
+---
+
