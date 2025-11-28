@@ -1,11 +1,11 @@
-﻿=#include "bitchute-handler.hpp"
+﻿#include "bitchute-handler.hpp"
 
 BitchuteHandler::BitchuteHandler(QObject *parent)
     : PlatformHandler(parent)
     , m_networkManager(new QNetworkAccessManager(this))
     , m_pollTimer(new QTimer(this))
 {
-    connect(m_pollTimer, &QTimer::timeout, this, &BitchuteHandler::onPollTimer);
+    QObject::connect(m_pollTimer, &QTimer::timeout, this, &BitchuteHandler::onPollTimer);
 }
 
 BitchuteHandler::~BitchuteHandler()
