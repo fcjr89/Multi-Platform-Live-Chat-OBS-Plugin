@@ -29,44 +29,16 @@ jobs:
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v2
     
-    - name: Download OBS Studio
+    - name: Download OBS Dependencies
+      shell: powershell
       run: |
-        # Download OBS Studio Windows build
-        $obsVersion = "30.0.2"
-        $obsUrl = "https://github.com/obsproject/obs-studio/releases/download/$obsVersion/obs-studio-$obsVersion-windows-x64.zip"
+        Write-Host "Downloading OBS headers..."
+        git clone --branch 30.0.2 --depth 1 https://github.com/obsproject/obs-studio.git D:\obs-studio
         
-        Write-Host "Downloading OBS from: $obsUrl"
+        echo "LIBOBS_INCLUDE_DIR=D:\obs-studio\libobs" >> $env:GITHUB_ENV
+        echo "LIBOBS_LIB=D:\obs-studio\cmake\windows\obs.cmake" >> $env:GITHUB_ENV
         
-        try {
-          Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip -ErrorAction Stop
-          Write-Host "Download successful!"
-        } catch {
-          Write-Host "Primary download failed, trying alternate URL..."
-          $obsUrl = "https://cdn-fastly.obsproject.com/downloads/obs-studio-$obsVersion-windows-x64.zip"
-          Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip
-        }
-        
-        Write-Host "Extracting OBS..."
-        Expand-Archive -Path obs.zip -DestinationPath D:\obs -Force
-        
-        # Find the bin directory with OBS libraries
-        $obsBinDir = Get-ChildItem -Path D:\obs -Recurse -Directory -Filter "bin" | Select-Object -First 1
-        $obsDataDir = Get-ChildItem -Path D:\obs -Recurse -Directory -Filter "data" | Select-Object -First 1
-        
-        if ($obsBinDir) {
-          $obsRoot = $obsBinDir.Parent.FullName
-          Write-Host "OBS root found at: $obsRoot"
-          
-          # Set environment variables for CMake
-          echo "LIBOBS_INCLUDE_DIR=$obsRoot\include" >> $env:GITHUB_ENV
-          echo "LIBOBS_LIB=$obsRoot\bin\64bit\obs.lib" >> $env:GITHUB_ENV
-          
-          Write-Host "Contents of OBS directory:"
-          Get-ChildItem -Path $obsRoot -Recurse -Depth 2
-        } else {
-          Write-Host "ERROR: Could not find OBS bin directory"
-          exit 1
-        }
+        Write-Host "Done!"
     
     - name: Configure CMake
       run: |
