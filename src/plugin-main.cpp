@@ -1,17 +1,34 @@
 ﻿#include <obs-module.h>
-#include <obs-frontend-api.h>
-#include <QMainWindow>
-#include <QAction>
-#include <QMessageBox>
 #include "chat-aggregator.hpp"
 #include "websocket-server.hpp"
 
 OBS_DECLARE_MODULE()
-OBS_MODULE_USE_DEFAULT_LOCALE("multi-platform-chat", "en-US")
 
 // Global instances
 ChatAggregator *g_chatAggregator = nullptr;
 WebSocketServer *g_webSocketServer = nullptr;
+
+// Stub locale functions to avoid linking errors
+static void *text_lookup = nullptr;
+
+extern "C" void obs_module_set_locale(const char *locale)
+{
+    (void)locale;
+}
+
+extern "C" void obs_module_free_locale(void)
+{
+}
+
+extern "C" const char *obs_module_get_string(const char *lookup_string)
+{
+    return lookup_string;
+}
+
+extern "C" const char *obs_module_text(const char *lookup_string)
+{
+    return lookup_string;
+}
 
 // Module description
 MODULE_EXPORT const char *obs_module_description(void)
@@ -49,8 +66,6 @@ bool obs_module_load(void)
     
     g_webSocketServer->setChatAggregator(g_chatAggregator);
 
-    // TODO: Add OBS UI integration when obs.lib is available
-    
     return true;
 }
 
@@ -72,5 +87,4 @@ void obs_module_unload(void)
 // Post-load callback
 void obs_module_post_load(void)
 {
-    // Empty for now
 }
