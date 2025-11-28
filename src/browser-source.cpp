@@ -141,7 +141,7 @@ static void chat_browser_source_deactivate(void *data)
     blog(LOG_INFO, "Chat browser source deactivated");
 }
 
-// Source info structure
+// Source info structure - Fixed order to match obs_source_info struct
 static struct obs_source_info chat_browser_source_info = {
     .id = "multi_platform_chat_browser_source",
     .type = OBS_SOURCE_TYPE_INPUT,
@@ -150,14 +150,14 @@ static struct obs_source_info chat_browser_source_info = {
     .create = chat_browser_source_create,
     .destroy = chat_browser_source_destroy,
     .update = chat_browser_source_update,
-    .get_defaults = chat_browser_source_defaults,
-    .get_properties = chat_browser_source_properties,
+    .activate = chat_browser_source_activate,      // Moved up
+    .deactivate = chat_browser_source_deactivate,  // Moved up
+    .show = chat_browser_source_show,              // Moved down
+    .hide = chat_browser_source_hide,              // Moved down
     .get_width = chat_browser_source_get_width,
     .get_height = chat_browser_source_get_height,
-    .show = chat_browser_source_show,
-    .hide = chat_browser_source_hide,
-    .activate = chat_browser_source_activate,
-    .deactivate = chat_browser_source_deactivate,
+    .get_defaults = chat_browser_source_defaults,
+    .get_properties = chat_browser_source_properties,
 };
 
 // Register the browser source

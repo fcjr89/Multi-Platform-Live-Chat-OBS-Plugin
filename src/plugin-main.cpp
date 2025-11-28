@@ -135,7 +135,8 @@ void obs_module_unload(void)
     // Clean up in reverse order
     if (g_chatDock) {
         blog(LOG_INFO, "Removing chat dock...");
-        obs_frontend_remove_dock(g_chatDock);
+        // obs_frontend_remove_dock() doesn't exist - just delete the widget
+        // The dock will be automatically removed when the widget is destroyed
         delete g_chatDock;
         g_chatDock = nullptr;
     }
