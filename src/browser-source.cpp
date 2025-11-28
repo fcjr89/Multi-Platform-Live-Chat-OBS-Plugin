@@ -141,28 +141,26 @@ static void chat_browser_source_deactivate(void *data)
     blog(LOG_INFO, "Chat browser source deactivated");
 }
 
-// Source info structure - Fixed order to match obs_source_info struct
-static struct obs_source_info chat_browser_source_info = {
-    .id = "multi_platform_chat_browser_source",
-    .type = OBS_SOURCE_TYPE_INPUT,
-    .output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_DO_NOT_DUPLICATE,
-    .get_name = chat_browser_source_get_name,
-    .create = chat_browser_source_create,
-    .destroy = chat_browser_source_destroy,
-    .update = chat_browser_source_update,
-    .activate = chat_browser_source_activate,      // Moved up
-    .deactivate = chat_browser_source_deactivate,  // Moved up
-    .show = chat_browser_source_show,              // Moved down
-    .hide = chat_browser_source_hide,              // Moved down
-    .get_width = chat_browser_source_get_width,
-    .get_height = chat_browser_source_get_height,
-    .get_defaults = chat_browser_source_defaults,
-    .get_properties = chat_browser_source_properties,
-};
-
 // Register the browser source
 void register_chat_browser_source()
 {
-    obs_register_source(&chat_browser_source_info);
+    struct obs_source_info info = {};
+    info.id = "multi_platform_chat_browser_source";
+    info.type = OBS_SOURCE_TYPE_INPUT;
+    info.output_flags = OBS_SOURCE_ASYNC_VIDEO | OBS_SOURCE_DO_NOT_DUPLICATE;
+    info.get_name = chat_browser_source_get_name;
+    info.create = chat_browser_source_create;
+    info.destroy = chat_browser_source_destroy;
+    info.update = chat_browser_source_update;
+    info.get_defaults = chat_browser_source_defaults;
+    info.get_properties = chat_browser_source_properties;
+    info.get_width = chat_browser_source_get_width;
+    info.get_height = chat_browser_source_get_height;
+    info.activate = chat_browser_source_activate;
+    info.deactivate = chat_browser_source_deactivate;
+    info.show = chat_browser_source_show;
+    info.hide = chat_browser_source_hide;
+    
+    obs_register_source(&info);
     blog(LOG_INFO, "Multi-Platform Chat browser source registered");
 }
