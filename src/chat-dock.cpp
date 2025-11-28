@@ -9,6 +9,8 @@
 #include <QDateTime>
 #include <QSettings>
 #include <QDebug>
+#include <QInputDialog>    // ← ADDED
+#include <QSpinBox>        // ← ADDED
 
 ChatDock::ChatDock(QWidget *parent)
     : QDockWidget("Multi-Platform Chat", parent)

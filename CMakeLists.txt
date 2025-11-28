@@ -8,8 +8,24 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# Find Qt6
+# Find Qt6 - ADD WIDGETS!
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network WebSockets)
+
+# Find OBS
+if(WIN32)
+    if(DEFINED ENV{LIBOBS_INCLUDE_DIR})
+        set(LIBOBS_INCLUDE_DIR $ENV{LIBOBS_INCLUDE_DIR})
+    endif()
+    
+    if(NOT LIBOBS_INCLUDE_DIR)
+        message(FATAL_ERROR "LIBOBS_INCLUDE_DIR not set")
+    endif()
+    
+    message(STATUS "OBS Include Dir: ${LIBOBS_INCLUDE_DIR}")
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBOBS REQUIRED libobs)
+endif()
 
 # Source files
 set(PLUGIN_SOURCES
@@ -42,12 +58,18 @@ add_library(${PROJECT_NAME} MODULE
     ${PLUGIN_HEADERS}
 )
 
-# Link Qt libraries
+# Link Qt libraries - INCLUDE WIDGETS!
 target_link_libraries(${PROJECT_NAME}
     Qt6::Core
     Qt6::Widgets
     Qt6::Network
     Qt6::WebSockets
+)
+
+# Include OBS headers
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${LIBOBS_INCLUDE_DIR}
 )
 
 # Set properties
@@ -56,15 +78,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME "multi-platform-chat"
 )
 
-# Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
-
 message(STATUS "===========================================")
 message(STATUS "Multi-Platform Chat OBS Plugin")
 message(STATUS "===========================================")
 message(STATUS "Qt6 location: ${Qt6_DIR}")
+message(STATUS "OBS headers: ${LIBOBS_INCLUDE_DIR}")
 message(STATUS "Source files found: ${PLUGIN_SOURCES}")
-message(STATUS "Output: ${CMAKE_BINARY_DIR}")
 message(STATUS "===========================================")

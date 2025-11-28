@@ -4,7 +4,6 @@
 #include <QMap>
 #include <QList>
 #include <QTimer>
-#include <memory>
 #include "platform-handler.hpp"
 
 class ChatAggregator : public QObject {
@@ -49,11 +48,11 @@ private slots:
     void onPlatformError(const QString &error);
 
 private:
-    std::unique_ptr<PlatformHandler> createHandler(const QString &platform);
+    PlatformHandler* createHandler(const QString &platform);
     bool shouldFilterMessage(const ChatMessage &message) const;
     void addToHistory(const ChatMessage &message);
 
-    QMap<QString, std::unique_ptr<PlatformHandler>> m_handlers;
+    QMap<QString, PlatformHandler*> m_handlers;  // Changed from unique_ptr to raw pointer
     QList<ChatMessage> m_messageHistory;
     QMap<QString, int> m_messageCounts;
     QStringList m_filterKeywords;
