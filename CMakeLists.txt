@@ -2,13 +2,13 @@
 
 project(multi-platform-chat VERSION 1.0.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)  # ← Changed from 17 to 20
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# Find Qt6 - ADD WIDGETS!
+# Find Qt6
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network WebSockets)
 
 # Find OBS
@@ -58,7 +58,7 @@ add_library(${PROJECT_NAME} MODULE
     ${PLUGIN_HEADERS}
 )
 
-# Link Qt libraries - INCLUDE WIDGETS!
+# Link Qt libraries
 target_link_libraries(${PROJECT_NAME}
     Qt6::Core
     Qt6::Widgets
@@ -66,10 +66,11 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::WebSockets
 )
 
-# Include OBS headers
+# Include OBS headers (both libobs and UI)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${LIBOBS_INCLUDE_DIR}
+    ${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api  # ← Added for obs-frontend-api.h
 )
 
 # Set properties

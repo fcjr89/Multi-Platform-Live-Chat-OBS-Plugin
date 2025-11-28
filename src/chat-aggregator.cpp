@@ -234,6 +234,9 @@ ChatAggregator::ChatAggregator(QObject *parent)
 ChatAggregator::~ChatAggregator()
 {
     disconnectAll();
+    // Clean up raw pointers
+    qDeleteAll(m_handlers);
+    m_handlers.clear();
 }
 
 void ChatAggregator::addPlatform(const QString &platform, 
@@ -246,24 +249,25 @@ void ChatAggregator::addPlatform(const QString &platform,
         removePlatform(platformLower);
     }
 
-    auto handler = createHandler(platformLower);
+    PlatformHandler* handler = createHandler(platformLower);  // Changed from auto
     if (!handler) {
         emit platformError(platformLower, "Unsupported platform");
         return;
     }
 
-    connect(handler.get(), &PlatformHandler::messageReceived,
+    connect(handler, &PlatformHandler::messageReceived,  // Changed from handler.get()
             this, &ChatAggregator::onMessageReceived);
-    connect(handler.get(), &PlatformHandler::connectionStatusChanged,
+    connect(handler, &PlatformHandler::connectionStatusChanged,
             this, &ChatAggregator::onConnectionStatusChanged);
-    connect(handler.get(), &PlatformHandler::errorOccurred,
+    connect(handler, &PlatformHandler::errorOccurred,
             this, &ChatAggregator::onPlatformError);
 
     if (handler->connect(channelId, authToken)) {
-        m_handlers[platformLower] = std::move(handler);
+        m_handlers[platformLower] = handler;  // Changed from std::move(handler)
         m_messageCounts[platformLower] = 0;
         qDebug() << "Added platform:" << platformLower;
     } else {
+        delete handler;  // Clean up on failure
         emit platformError(platformLower, "Failed to connect");
     }
 }
@@ -274,6 +278,7 @@ void ChatAggregator::removePlatform(const QString &platform)
     
     if (m_handlers.contains(platformLower)) {
         m_handlers[platformLower]->disconnect();
+        delete m_handlers[platformLower];  // Delete the pointer
         m_handlers.remove(platformLower);
         emit platformDisconnected(platformLower);
     }
@@ -281,9 +286,10 @@ void ChatAggregator::removePlatform(const QString &platform)
 
 void ChatAggregator::disconnectAll()
 {
-    for (auto &handler : m_handlers) {
+    for (auto handler : m_handlers) {  // Changed from auto&
         handler->disconnect();
     }
+    qDeleteAll(m_handlers);  // Clean up all pointers
     m_handlers.clear();
 }
 
@@ -384,27 +390,27 @@ void ChatAggregator::onPlatformError(const QString &error)
     emit platformError(platform, error);
 }
 
-std::unique_ptr<PlatformHandler> ChatAggregator::createHandler(const QString &platform)
+PlatformHandler* ChatAggregator::createHandler(const QString &platform)  // Changed return type
 {
-    if (platform == "youtube") return std::make_unique<YouTubeHandler>();
-    if (platform == "twitch") return std::make_unique<TwitchHandler>();
-    if (platform == "kick") return std::make_unique<KickHandler>();
-    if (platform == "rumble") return std::make_unique<RumbleHandler>();
-    if (platform == "gettr") return std::make_unique<GettrHandler>();
-    if (platform == "odysee") return std::make_unique<OdyseeHandler>();
-    if (platform == "pilled") return std::make_unique<PilledHandler>();
-    if (platform == "bigo") return std::make_unique<BigoHandler>();
-    if (platform == "instagram") return std::make_unique<InstagramHandler>();
-    if (platform == "facebook") return std::make_unique<FacebookHandler>();
-    if (platform == "nimo") return std::make_unique<NimoHandler>();
-    if (platform == "retake") return std::make_unique<RetakeHandler>();
-    if (platform == "soop") return std::make_unique<SoopHandler>();
-    if (platform == "fc2") return std::make_unique<FC2Handler>();
-    if (platform == "bitchute") return std::make_unique<BitchuteHandler>();
-    if (platform == "dlive") return std::make_unique<DLiveHandler>();
-    if (platform == "twitter" || platform == "x") return std::make_unique<TwitterHandler>();
-    if (platform == "vk") return std::make_unique<VKHandler>();
-    if (platform == "locals") return std::make_unique<LocalsHandler>();
+    if (platform == "youtube") return new YouTubeHandler();  // Changed from make_unique
+    if (platform == "twitch") return new TwitchHandler();
+    if (platform == "kick") return new KickHandler();
+    if (platform == "rumble") return new RumbleHandler();
+    if (platform == "gettr") return new GettrHandler();
+    if (platform == "odysee") return new OdyseeHandler();
+    if (platform == "pilled") return new PilledHandler();
+    if (platform == "bigo") return new BigoHandler();
+    if (platform == "instagram") return new InstagramHandler();
+    if (platform == "facebook") return new FacebookHandler();
+    if (platform == "nimo") return new NimoHandler();
+    if (platform == "retake") return new RetakeHandler();
+    if (platform == "soop") return new SoopHandler();
+    if (platform == "fc2") return new FC2Handler();
+    if (platform == "bitchute") return new BitchuteHandler();
+    if (platform == "dlive") return new DLiveHandler();
+    if (platform == "twitter" || platform == "x") return new TwitterHandler();
+    if (platform == "vk") return new VKHandler();
+    if (platform == "locals") return new LocalsHandler();
     
     return nullptr;
 }
