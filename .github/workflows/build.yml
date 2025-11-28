@@ -36,7 +36,6 @@ jobs:
         git clone --branch 30.0.2 --depth 1 https://github.com/obsproject/obs-studio.git D:\obs-studio
         
         echo "LIBOBS_INCLUDE_DIR=D:\obs-studio\libobs" >> $env:GITHUB_ENV
-        echo "LIBOBS_LIB=D:\obs-studio\cmake\windows\obs.cmake" >> $env:GITHUB_ENV
         
         Write-Host "Done!"
     
@@ -59,34 +58,37 @@ jobs:
         path: build/Release/*.dll
         if-no-files-found: warn
 
-  build-linux:
-    name: Linux Build
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-    
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev \
-          libobs-dev obs-studio
-    
-    - name: Configure CMake
-      run: |
-        mkdir build
-        cd build
-        cmake ..
-    
-    - name: Build Plugin
-      run: |
-        cd build
-        make -j$(nproc)
-    
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: obs-plugin-linux
-        path: build/*.so
-        if-no-files-found: warn
+  # Linux build disabled - Windows only
+  # Uncomment below if Linux support is needed in the future
+  
+  # build-linux:
+  #   name: Linux Build
+  #   runs-on: ubuntu-latest
+  #   
+  #   steps:
+  #   - name: Checkout Code
+  #     uses: actions/checkout@v4
+  #   
+  #   - name: Install Dependencies
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev \
+  #         libobs-dev obs-studio
+  #   
+  #   - name: Configure CMake
+  #     run: |
+  #       mkdir build
+  #       cd build
+  #       cmake ..
+  #   
+  #   - name: Build Plugin
+  #     run: |
+  #       cd build
+  #       make -j$(nproc)
+  #   
+  #   - name: Upload Artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: obs-plugin-linux
+  #       path: build/*.so
+  #       if-no-files-found: warn
