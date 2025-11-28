@@ -43,6 +43,13 @@ void TwitchHandler::disconnect()
     emit connectionStatusChanged(false);
 }
 
+void TwitchHandler::sendMessage(const QString &message)
+{
+    if (m_connected && m_webSocket->isValid()) {
+        m_webSocket->sendTextMessage("PRIVMSG #" + m_channelId.toLower() + " :" + message);
+    }
+}
+
 void TwitchHandler::onWebSocketConnected()
 {
     m_webSocket->sendTextMessage("CAP REQ :twitch.tv/tags twitch.tv/commands");
