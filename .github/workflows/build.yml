@@ -51,44 +51,49 @@ jobs:
         cd build
         cmake --build . --config Release
     
+    - name: Package Plugin with Dependencies
+      shell: powershell
+      run: |
+        # Create package directory
+        New-Item -ItemType Directory -Force -Path "package"
+        
+        # Copy the plugin DLL
+        Copy-Item "build\Release\multi-platform-chat.dll" -Destination "package\"
+        
+        # Copy required Qt DLLs
+        $qtBinPath = "${env:Qt6_DIR}\bin"
+        Write-Host "Qt bin path: $qtBinPath"
+        
+        $qtDlls = @(
+            "Qt6Core.dll",
+            "Qt6Gui.dll", 
+            "Qt6Widgets.dll",
+            "Qt6Network.dll",
+            "Qt6WebSockets.dll"
+        )
+        
+        foreach ($dll in $qtDlls) {
+            $sourcePath = Join-Path $qtBinPath $dll
+            if (Test-Path $sourcePath) {
+                Copy-Item $sourcePath -Destination "package\"
+                Write-Host "Copied: $dll"
+            } else {
+                Write-Host "WARNING: $dll not found at $sourcePath"
+            }
+        }
+        
+        # Copy Qt platform plugins
+        New-Item -ItemType Directory -Force -Path "package\platforms"
+        Copy-Item "${qtBinPath}\..\plugins\platforms\qwindows.dll" -Destination "package\platforms\" -ErrorAction SilentlyContinue
+        
+        Write-Host "Package contents:"
+        Get-ChildItem -Recurse package
+    
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: obs-plugin-windows
-        path: build/Release/*.dll
-        if-no-files-found: warn
+        name: obs-plugin-windows-with-qt
+        path: package/*
+        if-no-files-found: error
 
   # Linux build disabled - Windows only
-  # Uncomment below if Linux support is needed in the future
-  
-  # build-linux:
-  #   name: Linux Build
-  #   runs-on: ubuntu-latest
-  #   
-  #   steps:
-  #   - name: Checkout Code
-  #     uses: actions/checkout@v4
-  #   
-  #   - name: Install Dependencies
-  #     run: |
-  #       sudo apt-get update
-  #       sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev \
-  #         libobs-dev obs-studio
-  #   
-  #   - name: Configure CMake
-  #     run: |
-  #       mkdir build
-  #       cd build
-  #       cmake ..
-  #   
-  #   - name: Build Plugin
-  #     run: |
-  #       cd build
-  #       make -j$(nproc)
-  #   
-  #   - name: Upload Artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: obs-plugin-linux
-  #       path: build/*.so
-  #       if-no-files-found: warn
