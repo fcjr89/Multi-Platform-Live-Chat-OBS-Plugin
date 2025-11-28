@@ -1,0 +1,79 @@
+﻿name: Build OBS Plugin
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Windows Build
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.6.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        modules: 'qtwebsockets qtnetwork'
+        cache: true
+    
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH="${env:Qt6_DIR}"
+    
+    - name: Build Plugin
+      run: |
+        cd build
+        cmake --build . --config Release
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: obs-plugin-windows
+        path: build/Release/*.dll
+        if-no-files-found: warn
+
+  build-linux:
+    name: Linux Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev
+    
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake ..
+    
+    - name: Build Plugin
+      run: |
+        cd build
+        make -j$(nproc)
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: obs-plugin-linux
+        path: build/*.so
+        if-no-files-found: warn
