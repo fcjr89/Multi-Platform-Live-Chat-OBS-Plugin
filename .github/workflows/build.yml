@@ -29,11 +29,23 @@ jobs:
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v2
     
+    - name: Download OBS Studio
+      run: |
+        $obsVersion = "30.0.0"
+        $obsUrl = "https://github.com/obsproject/obs-studio/releases/download/$obsVersion/OBS-Studio-$obsVersion-Windows.zip"
+        Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip
+        Expand-Archive -Path obs.zip -DestinationPath D:\obs-studio
+        echo "OBS_DIR=D:\obs-studio" >> $env:GITHUB_ENV
+    
     - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH="${env:Qt6_DIR}"
+        cmake .. -G "Visual Studio 17 2022" -A x64 `
+          -DCMAKE_PREFIX_PATH="${env:Qt6_DIR}" `
+          -DLIBOBS_INCLUDE_DIR="${env:OBS_DIR}\include" `
+          -DLIBOBS_LIB="${env:OBS_DIR}\bin\64bit\obs.lib" `
+          -DOBS_FRONTEND_LIB="${env:OBS_DIR}\bin\64bit\obs-frontend-api.lib"
     
     - name: Build Plugin
       run: |
@@ -58,7 +70,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev
+        sudo apt-get install -y build-essential cmake qt6-base-dev qt6-websockets-dev \
+          libobs-dev obs-studio
     
     - name: Configure CMake
       run: |
