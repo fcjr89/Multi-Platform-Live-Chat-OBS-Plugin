@@ -31,21 +31,49 @@ jobs:
     
     - name: Download OBS Studio
       run: |
-        $obsVersion = "30.0.0"
-        $obsUrl = "https://github.com/obsproject/obs-studio/releases/download/$obsVersion/OBS-Studio-$obsVersion-Windows.zip"
-        Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip
-        Expand-Archive -Path obs.zip -DestinationPath D:\obs-studio
-        echo "OBS_DIR=D:\obs-studio" >> $env:GITHUB_ENV
+        # Download OBS Studio Windows build
+        $obsVersion = "30.0.2"
+        $obsUrl = "https://github.com/obsproject/obs-studio/releases/download/$obsVersion/obs-studio-$obsVersion-windows-x64.zip"
+        
+        Write-Host "Downloading OBS from: $obsUrl"
+        
+        try {
+          Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip -ErrorAction Stop
+          Write-Host "Download successful!"
+        } catch {
+          Write-Host "Primary download failed, trying alternate URL..."
+          $obsUrl = "https://cdn-fastly.obsproject.com/downloads/obs-studio-$obsVersion-windows-x64.zip"
+          Invoke-WebRequest -Uri $obsUrl -OutFile obs.zip
+        }
+        
+        Write-Host "Extracting OBS..."
+        Expand-Archive -Path obs.zip -DestinationPath D:\obs -Force
+        
+        # Find the bin directory with OBS libraries
+        $obsBinDir = Get-ChildItem -Path D:\obs -Recurse -Directory -Filter "bin" | Select-Object -First 1
+        $obsDataDir = Get-ChildItem -Path D:\obs -Recurse -Directory -Filter "data" | Select-Object -First 1
+        
+        if ($obsBinDir) {
+          $obsRoot = $obsBinDir.Parent.FullName
+          Write-Host "OBS root found at: $obsRoot"
+          
+          # Set environment variables for CMake
+          echo "LIBOBS_INCLUDE_DIR=$obsRoot\include" >> $env:GITHUB_ENV
+          echo "LIBOBS_LIB=$obsRoot\bin\64bit\obs.lib" >> $env:GITHUB_ENV
+          
+          Write-Host "Contents of OBS directory:"
+          Get-ChildItem -Path $obsRoot -Recurse -Depth 2
+        } else {
+          Write-Host "ERROR: Could not find OBS bin directory"
+          exit 1
+        }
     
     - name: Configure CMake
       run: |
         mkdir build
         cd build
         cmake .. -G "Visual Studio 17 2022" -A x64 `
-          -DCMAKE_PREFIX_PATH="${env:Qt6_DIR}" `
-          -DLIBOBS_INCLUDE_DIR="${env:OBS_DIR}\include" `
-          -DLIBOBS_LIB="${env:OBS_DIR}\bin\64bit\obs.lib" `
-          -DOBS_FRONTEND_LIB="${env:OBS_DIR}\bin\64bit\obs-frontend-api.lib"
+          -DCMAKE_PREFIX_PATH="${env:Qt6_DIR}"
     
     - name: Build Plugin
       run: |
