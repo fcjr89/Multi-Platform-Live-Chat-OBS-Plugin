@@ -1,226 +1,26 @@
 #include "chat-aggregator.hpp"
 #include <QDebug>
 
-// Forward declarations for platform handlers
-// Note: These will be implemented in separate files
-
-class YouTubeHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "YouTube"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        // TODO: Implement YouTube connection
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class TwitchHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Twitch"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        // TODO: Implement Twitch connection
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class KickHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Kick"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        // TODO: Implement Kick connection
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class RumbleHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Rumble"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class GettrHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Gettr"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class OdyseeHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Odysee"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class PilledHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Pilled"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class BigoHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Bigo"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class InstagramHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Instagram"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class FacebookHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Facebook"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class NimoHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Nimo"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class RetakeHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Retake"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class SoopHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Soop"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class FC2Handler : public PlatformHandler {
-public:
-    QString platformName() const override { return "FC2"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class BitchuteHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Bitchute"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class DLiveHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "DLive"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class TwitterHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Twitter"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class VKHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "VK"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
-
-class LocalsHandler : public PlatformHandler {
-public:
-    QString platformName() const override { return "Locals"; }
-    bool connect(const QString &channelId, const QString &authToken) override {
-        m_channelId = channelId;
-        m_authToken = authToken;
-        m_connected = false;
-        return m_connected;
-    }
-    void disconnect() override { m_connected = false; }
-};
+// Include all platform handlers
+#include "platform-handlers/youtube-handler.hpp"
+#include "platform-handlers/twitch-handler.hpp"
+#include "platform-handlers/kick-handler.hpp"
+#include "platform-handlers/rumble-handler.hpp"
+#include "platform-handlers/gettr-handler.hpp"
+#include "platform-handlers/odysee-handler.hpp"
+#include "platform-handlers/pilled-handler.hpp"
+#include "platform-handlers/bigo-handler.hpp"
+#include "platform-handlers/instagram-handler.hpp"
+#include "platform-handlers/facebook-handler.hpp"
+#include "platform-handlers/nimo-handler.hpp"
+#include "platform-handlers/retake-handler.hpp"
+#include "platform-handlers/soop-handler.hpp"
+#include "platform-handlers/fc2-handler.hpp"
+#include "platform-handlers/bitchute-handler.hpp"
+#include "platform-handlers/dlive-handler.hpp"
+#include "platform-handlers/twitter-handler.hpp"
+#include "platform-handlers/vk-handler.hpp"
+#include "platform-handlers/locals-handler.hpp"
 
 // ChatAggregator Implementation
 
@@ -234,7 +34,6 @@ ChatAggregator::ChatAggregator(QObject *parent)
 ChatAggregator::~ChatAggregator()
 {
     disconnectAll();
-    // Clean up raw pointers
     qDeleteAll(m_handlers);
     m_handlers.clear();
 }
@@ -249,25 +48,25 @@ void ChatAggregator::addPlatform(const QString &platform,
         removePlatform(platformLower);
     }
 
-    PlatformHandler* handler = createHandler(platformLower);  // Changed from auto
+    PlatformHandler* handler = createHandler(platformLower);
     if (!handler) {
         emit platformError(platformLower, "Unsupported platform");
         return;
     }
 
-    connect(handler, &PlatformHandler::messageReceived,  // Changed from handler.get()
+    QObject::connect(handler, &PlatformHandler::messageReceived,
             this, &ChatAggregator::onMessageReceived);
-    connect(handler, &PlatformHandler::connectionStatusChanged,
+    QObject::connect(handler, &PlatformHandler::connectionStatusChanged,
             this, &ChatAggregator::onConnectionStatusChanged);
-    connect(handler, &PlatformHandler::errorOccurred,
+    QObject::connect(handler, &PlatformHandler::errorOccurred,
             this, &ChatAggregator::onPlatformError);
 
     if (handler->connect(channelId, authToken)) {
-        m_handlers[platformLower] = handler;  // Changed from std::move(handler)
+        m_handlers[platformLower] = handler;
         m_messageCounts[platformLower] = 0;
         qDebug() << "Added platform:" << platformLower;
     } else {
-        delete handler;  // Clean up on failure
+        delete handler;
         emit platformError(platformLower, "Failed to connect");
     }
 }
@@ -278,7 +77,7 @@ void ChatAggregator::removePlatform(const QString &platform)
     
     if (m_handlers.contains(platformLower)) {
         m_handlers[platformLower]->disconnect();
-        delete m_handlers[platformLower];  // Delete the pointer
+        delete m_handlers[platformLower];
         m_handlers.remove(platformLower);
         emit platformDisconnected(platformLower);
     }
@@ -286,10 +85,10 @@ void ChatAggregator::removePlatform(const QString &platform)
 
 void ChatAggregator::disconnectAll()
 {
-    for (auto handler : m_handlers) {  // Changed from auto&
+    for (auto handler : m_handlers) {
         handler->disconnect();
     }
-    qDeleteAll(m_handlers);  // Clean up all pointers
+    qDeleteAll(m_handlers);
     m_handlers.clear();
 }
 
@@ -390,9 +189,9 @@ void ChatAggregator::onPlatformError(const QString &error)
     emit platformError(platform, error);
 }
 
-PlatformHandler* ChatAggregator::createHandler(const QString &platform)  // Changed return type
+PlatformHandler* ChatAggregator::createHandler(const QString &platform)
 {
-    if (platform == "youtube") return new YouTubeHandler();  // Changed from make_unique
+    if (platform == "youtube") return new YouTubeHandler();
     if (platform == "twitch") return new TwitchHandler();
     if (platform == "kick") return new KickHandler();
     if (platform == "rumble") return new RumbleHandler();
@@ -405,11 +204,11 @@ PlatformHandler* ChatAggregator::createHandler(const QString &platform)  // Chan
     if (platform == "nimo") return new NimoHandler();
     if (platform == "retake") return new RetakeHandler();
     if (platform == "soop") return new SoopHandler();
-    if (platform == "fc2") return new FC2Handler();
+    if (platform == "fc2") return new Fc2Handler();
     if (platform == "bitchute") return new BitchuteHandler();
-    if (platform == "dlive") return new DLiveHandler();
+    if (platform == "dlive") return new DliveHandler();
     if (platform == "twitter" || platform == "x") return new TwitterHandler();
-    if (platform == "vk") return new VKHandler();
+    if (platform == "vk") return new VkHandler();
     if (platform == "locals") return new LocalsHandler();
     
     return nullptr;
