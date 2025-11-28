@@ -60,9 +60,26 @@ jobs:
         # Copy the plugin DLL
         Copy-Item "build\Release\multi-platform-chat.dll" -Destination "package\"
         
-        # Copy required Qt DLLs
-        $qtBinPath = "${env:Qt6_DIR}\bin"
+        # Find Qt bin directory (the install-qt-action sets this)
+        $qtRoot = $env:Qt6_DIR
+        if ([string]::IsNullOrEmpty($qtRoot)) {
+            # Fallback: search in common locations
+            $qtRoot = Get-ChildItem "D:\a\Multi-Platform-Live-Chat-OBS-Plugin\Qt" -Directory | 
+                      Where-Object { $_.Name -match "^6\." } | 
+                      Select-Object -First 1 | 
+                      ForEach-Object { Join-Path $_.FullName "msvc2019_64" }
+        }
+        
+        $qtBinPath = Join-Path $qtRoot "bin"
+        Write-Host "Qt root: $qtRoot"
         Write-Host "Qt bin path: $qtBinPath"
+        
+        if (-not (Test-Path $qtBinPath)) {
+            Write-Host "ERROR: Qt bin path not found!"
+            Write-Host "Searching for Qt installation..."
+            Get-ChildItem "D:\a\Multi-Platform-Live-Chat-OBS-Plugin\" -Recurse -Filter "Qt6Core.dll" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+        }
         
         $qtDlls = @(
             "Qt6Core.dll",
@@ -78,15 +95,22 @@ jobs:
                 Copy-Item $sourcePath -Destination "package\"
                 Write-Host "Copied: $dll"
             } else {
-                Write-Host "WARNING: $dll not found at $sourcePath"
+                Write-Host "ERROR: $dll not found at $sourcePath"
+                exit 1
             }
         }
         
         # Copy Qt platform plugins
         New-Item -ItemType Directory -Force -Path "package\platforms"
-        Copy-Item "${qtBinPath}\..\plugins\platforms\qwindows.dll" -Destination "package\platforms\" -ErrorAction SilentlyContinue
+        $platformPlugin = Join-Path $qtRoot "plugins\platforms\qwindows.dll"
+        if (Test-Path $platformPlugin) {
+            Copy-Item $platformPlugin -Destination "package\platforms\"
+            Write-Host "Copied: qwindows.dll"
+        } else {
+            Write-Host "WARNING: qwindows.dll not found"
+        }
         
-        Write-Host "Package contents:"
+        Write-Host "`nPackage contents:"
         Get-ChildItem -Recurse package
     
     - name: Upload Artifact
@@ -95,5 +119,3 @@ jobs:
         name: obs-plugin-windows-with-qt
         path: package/*
         if-no-files-found: error
-
-  # Linux build disabled - Windows only
